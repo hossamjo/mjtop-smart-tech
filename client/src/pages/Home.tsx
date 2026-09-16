@@ -82,8 +82,15 @@ export default function Home() {
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("keydown", onKeyDown);
+    };
   }, []);
 
   const closeMenu = () => setMenuOpen(false);
@@ -114,7 +121,7 @@ export default function Home() {
             </span>
           </a>
 
-          <nav className={`main-nav ${menuOpen ? "is-open" : ""}`} aria-label="التنقل الرئيسي">
+          <nav id="main-navigation" className={`main-nav ${menuOpen ? "is-open" : ""}`} aria-label="التنقل الرئيسي">
             {navItems.map((item) => (
               <a key={item.href} href={item.href} onClick={closeMenu}>
                 {item.label}
@@ -126,7 +133,7 @@ export default function Home() {
           </nav>
 
           <div className="header-actions">
-            <a className="header-cta" href="#contact">
+            <a className="header-cta" href="#contact" onClick={closeMenu}>
               ابدأ حواراً <ArrowUpLeft size={16} aria-hidden="true" />
             </a>
             <button
@@ -255,7 +262,7 @@ export default function Home() {
                   );
                 })}
               </div>
-              <div className={`service-feature tone-${services[activeService].tone}`}>
+              <div key={services[activeService].index} className={`service-feature tone-${services[activeService].tone}`}>
                 <div className="service-feature-top">
                   <span>خدمة {services[activeService].index}</span>
                   <Sparkles size={19} aria-hidden="true" />
