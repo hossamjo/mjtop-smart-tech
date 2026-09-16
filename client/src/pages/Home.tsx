@@ -29,6 +29,7 @@ const services = [
   {
     icon: BrainCircuit,
     index: "01",
+    slug: "ai-automation",
     title: "الذكاء الاصطناعي والأتمتة",
     description:
       "نحوّل الأعمال المتكررة إلى تدفقات ذكية تساعد فريقك يركّز على القرارات المهمة.",
@@ -37,6 +38,7 @@ const services = [
   {
     icon: ShieldCheck,
     index: "02",
+    slug: "cybersecurity",
     title: "الأمن السيبراني",
     description:
       "نصمّم طبقات حماية عملية ترفع جاهزية أنظمتك وتقلّل مساحة المخاطر الرقمية.",
@@ -45,6 +47,7 @@ const services = [
   {
     icon: CloudCog,
     index: "03",
+    slug: "cloud-infrastructure",
     title: "السحابة والبنية التحتية",
     description:
       "نبني أساساً مرناً وموثوقاً لتشغيل خدماتك ونموها بدون تعقيد تشغيلي زائد.",
@@ -53,6 +56,7 @@ const services = [
   {
     icon: Network,
     index: "04",
+    slug: "data-integration",
     title: "تكامل الأنظمة والبيانات",
     description:
       "نربط الأدوات والبيانات في منظومة واحدة واضحة، قابلة للتوسع والقياس.",
@@ -270,7 +274,7 @@ export default function Home() {
                 <div className="service-feature-icon"><ActiveServiceIcon size={38} /></div>
                 <h3>{services[activeService].title}</h3>
                 <p>{services[activeService].description}</p>
-                <a href="#contact">خلّينا نبدأ من هنا <ArrowUpLeft size={17} /></a>
+                <a href={`/services/${services[activeService].slug}`}>خلّينا نبدأ من هنا <ArrowUpLeft size={17} /></a>
                 <div className="feature-metric" aria-hidden="true">
                   <span /><span /><span /><span /><span /><span /><span /><span />
                 </div>
