@@ -8,6 +8,13 @@
       "when": 1789628667515,
       "tag": "0000_tired_king_bedlam",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1789635924474,
+      "tag": "0001_silly_hellfire_club",
+      "breakpoints": true
     }
   ]
 }

@@ -170,7 +170,7 @@ class SDKServer {
     return this.signSession(
       {
         openId,
-        appId: ENV.appId,
+        appId: ENV.appId || "local-auth",
         name: options.name || "",
       },
       options

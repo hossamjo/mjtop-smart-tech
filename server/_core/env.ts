@@ -10,4 +10,10 @@ export const ENV = {
   resendApiKey: process.env.RESEND_API_KEY ?? "",
   resendFromEmail: process.env.RESEND_FROM_EMAIL ?? "",
   contactRecipientEmail: process.env.CONTACT_RECIPIENT_EMAIL ?? "mjtop294@gmail.com",
+  googleClientId: process.env.GOOGLE_CLIENT_ID ?? "",
+  googleClientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
+  facebookAppId: process.env.FACEBOOK_APP_ID ?? "",
+  facebookAppSecret: process.env.FACEBOOK_APP_SECRET ?? "",
+  adminUsername: process.env.ADMIN_USERNAME ?? "mjtop249@gmail.com",
+  adminPasswordHash: process.env.ADMIN_PASSWORD_HASH ?? "",
 };

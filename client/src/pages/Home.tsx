@@ -13,6 +13,7 @@ import {
   Globe2,
   Instagram,
   Linkedin,
+  LogIn,
   Mail,
   MapPin,
   Menu,
@@ -86,6 +87,19 @@ export default function Home() {
   const [activeService, setActiveService] = useState(0);
   const [sent, setSent] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [authMessage, setAuthMessage] = useState("");
+  const authProviders = trpc.auth.providers.useQuery();
+  const loginLocal = trpc.auth.loginLocal.useMutation({
+    onSuccess: () => { setAuthMessage("تم تسجيل الدخول بنجاح."); setPassword(""); },
+    onError: (error) => setAuthMessage(error.message),
+  });
+  const loginGuest = trpc.auth.loginGuest.useMutation({
+    onSuccess: () => { setAuthMessage("دخلت كضيف. بعض خصائص الإدارة غير متاحة للضيف."); },
+    onError: (error) => setAuthMessage(error.message),
+  });
   const submitContact = trpc.contact.submit.useMutation({
     onSuccess: () => setSent(true),
   });
@@ -155,8 +169,11 @@ export default function Home() {
 
           <div className="header-actions">
             <a className="header-cta" href="#contact" onClick={closeMenu}>
-              ابدأ حواراً <ArrowUpLeft size={16} aria-hidden="true" />
+              ابدأ حواراً <ArrowUpLeft size={17} aria-hidden="true" />
             </a>
+            <button className="auth-trigger" type="button" onClick={() => setAuthOpen(true)}>
+              <LogIn size={16} aria-hidden="true" /> دخول
+            </button>
             <button
               className="menu-toggle"
               type="button"
@@ -170,6 +187,28 @@ export default function Home() {
           </div>
         </div>
       </header>
+
+      {authOpen && (
+        <div className="auth-overlay" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+          <div className="auth-card">
+            <button className="auth-close" type="button" aria-label="إغلاق" onClick={() => setAuthOpen(false)}><X size={18} /></button>
+            <div className="eyebrow"><span className="eyebrow-dot" /> حساب MjTop</div>
+            <h2 id="auth-title">سجّل دخولك بالطريقة المناسبة</h2>
+            <p>Google وFacebook جاهزان كتكاملات placeholder إلى حين إضافة مفاتيح OAuth.</p>
+            <div className="auth-provider-row">
+              <button type="button" className="auth-provider" disabled={!authProviders.data?.google}>Google <small>{authProviders.data?.google ? "متاح" : "Placeholder"}</small></button>
+              <button type="button" className="auth-provider" disabled={!authProviders.data?.facebook}>Facebook <small>{authProviders.data?.facebook ? "متاح" : "Placeholder"}</small></button>
+            </div>
+            <form className="auth-form" onSubmit={(event) => { event.preventDefault(); setAuthMessage(""); loginLocal.mutate({ username, password }); }}>
+              <label>اسم المستخدم<input value={username} onChange={(event) => setUsername(event.target.value)} placeholder="mjtop249@gmail.com" autoComplete="username" /></label>
+              <label>كلمة المرور<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="أدخل كلمة المرور" autoComplete="current-password" /></label>
+              <button className="button button-primary" type="submit" disabled={loginLocal.isPending || !authProviders.data?.local}>{loginLocal.isPending ? "جاري التحقق..." : "دخول الإدارة"}</button>
+            </form>
+            <button className="guest-button" type="button" onClick={() => loginGuest.mutate()} disabled={loginGuest.isPending}>الدخول كضيف</button>
+            {authMessage && <p className="auth-message" role="status">{authMessage}</p>}
+          </div>
+        </div>
+      )}
 
       <main id="main-content">
         <section className="hero" id="top">

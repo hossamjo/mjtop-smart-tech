@@ -1,4 +1,5 @@
 import { desc, eq } from "drizzle-orm";
+import { randomUUID } from "node:crypto";
 import { drizzle } from "drizzle-orm/mysql2";
 import { ContactMessage, contactMessages, InsertContactMessage, InsertUser, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
@@ -87,6 +88,47 @@ export async function getUserByOpenId(openId: string) {
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
 
   return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getUserByEmail(email: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  return result[0];
+}
+
+export async function createLocalAdmin(email: string, passwordHash: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is not configured");
+  const existing = await getUserByEmail(email);
+  if (existing) return existing;
+
+  const openId = `local:${email}`;
+  await db.insert(users).values({
+    openId,
+    name: "MjTop Administrator",
+    email,
+    loginMethod: "local",
+    authProvider: "local",
+    passwordHash,
+    role: "admin",
+  });
+  return getUserByOpenId(openId);
+}
+
+export async function createGuestUser() {
+  const db = await getDb();
+  if (!db) throw new Error("Database is not configured");
+  const openId = `guest:${randomUUID()}`;
+  await db.insert(users).values({
+    openId,
+    name: "Guest User",
+    email: null,
+    loginMethod: "guest",
+    authProvider: "guest",
+    role: "user",
+  });
+  return getUserByOpenId(openId);
 }
 
 export async function createContactMessage(message: InsertContactMessage): Promise<ContactMessage> {

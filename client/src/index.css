@@ -246,3 +246,32 @@ button { border: 0; }
 .admin-loading, .admin-empty, .admin-gate { display: grid; place-items: center; gap: .8rem; min-height: 260px; text-align: center; color: var(--ink-soft); }.admin-loading { display: flex; justify-content: center; }.admin-empty h2, .admin-empty p { margin: 0; }.admin-gate { min-height: 100vh; color: white; background: var(--night); }.admin-gate h1 { margin: 0; font-size: 24px; }.admin-gate svg { color: var(--cyan); }.is-spinning { animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (max-width: 700px) { .admin-main { padding-top: 48px; }.admin-heading { align-items: flex-start; flex-direction: column; }.admin-message-body { grid-template-columns: 1fr; gap: 1rem; }.admin-message-footer { align-items: flex-start; flex-direction: column; }.admin-header-actions > span { max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } }
+
+
+/* Authentication placeholders and guest access */
+.auth-trigger { display: inline-flex; align-items: center; gap: .45rem; border: 1px solid rgba(0, 194, 255, .35); background: rgba(0, 194, 255, .08); color: var(--ink, #071f3d); border-radius: 999px; padding: .65rem .9rem; cursor: pointer; transition: transform .16s ease-out, background .16s ease-out; }
+.auth-trigger:hover { background: rgba(0, 194, 255, .16); transform: translateY(-1px); }
+.auth-overlay { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 1rem; background: rgba(2, 16, 36, .72); backdrop-filter: blur(12px); }
+.auth-card { position: relative; width: min(100%, 460px); border: 1px solid rgba(0, 194, 255, .35); border-radius: 24px; padding: 2rem; background: #f3f7f8; color: #071f3d; box-shadow: 0 24px 80px rgba(0, 10, 30, .35); }
+.auth-card h2 { margin: .65rem 0 .45rem; font-size: clamp(1.55rem, 4vw, 2.1rem); }
+.auth-card p { color: #506276; line-height: 1.7; }
+.auth-close { position: absolute; top: 1rem; left: 1rem; display: grid; place-items: center; width: 2rem; height: 2rem; border: 0; border-radius: 50%; background: rgba(7, 31, 61, .08); color: #071f3d; cursor: pointer; }
+.auth-provider-row { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; margin: 1.25rem 0; }
+.auth-provider, .guest-button { min-height: 2.8rem; border: 1px solid rgba(7, 31, 61, .16); border-radius: 12px; background: white; color: #071f3d; font-weight: 700; cursor: pointer; }
+.auth-provider small { display: block; margin-top: .15rem; color: #738297; font-size: .68rem; font-weight: 500; }
+.auth-provider:disabled { cursor: not-allowed; opacity: .55; }
+.auth-form { display: grid; gap: .85rem; }
+.auth-form label { display: grid; gap: .35rem; color: #27405b; font-size: .86rem; font-weight: 700; }
+.auth-form input { width: 100%; border: 1px solid #c6d2da; border-radius: 10px; padding: .78rem .85rem; background: white; color: #071f3d; outline: none; }
+.auth-form input:focus { border-color: #00a9d6; box-shadow: 0 0 0 3px rgba(0, 169, 214, .16); }
+.guest-button { width: 100%; margin-top: .7rem; background: transparent; }
+.guest-button:hover { background: rgba(0, 194, 255, .08); }
+.auth-message { margin: .8rem 0 0; border-radius: 10px; padding: .7rem .8rem; background: rgba(0, 169, 214, .1); color: #07506a !important; font-size: .85rem; }
+@media (max-width: 760px) { .header-actions .auth-trigger { padding: .58rem .72rem; } .auth-card { padding: 1.45rem; } }
+
+.admin-local-login { display: grid; gap: .65rem; width: min(100%, 320px); margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid rgba(255,255,255,.16); }
+.admin-local-login label { display: grid; gap: .35rem; color: rgba(255,255,255,.7); font-size: .8rem; text-align: start; }
+.admin-local-login input { min-height: 2.6rem; border: 1px solid rgba(255,255,255,.22); border-radius: 10px; padding: .65rem .75rem; background: rgba(255,255,255,.08); color: white; }
+.admin-local-login .button-ghost { border-color: rgba(0,194,255,.45); color: var(--cyan); }
+.admin-local-login small { color: #ffb4b4; }
+.site-header .auth-trigger { color: white; }

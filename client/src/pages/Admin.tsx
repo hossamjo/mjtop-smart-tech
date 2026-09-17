@@ -1,3 +1,4 @@
+import { useState, type ReactNode } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { startLogin } from "@/const";
 import { trpc } from "@/lib/trpc";
@@ -21,7 +22,7 @@ export default function Admin() {
   });
 
   if (loading) return <AdminLoading />;
-  if (!user) return <AdminGate title="سجّل الدخول للوصول إلى لوحة الإدارة" action="تسجيل الدخول" onAction={() => startLogin()} />;
+  if (!user) return <AdminGate title="سجّل الدخول للوصول إلى لوحة الإدارة" action="تسجيل الدخول" onAction={() => startLogin()}><LocalAdminLogin /></AdminGate>;
   if (user.role !== "admin") return <AdminGate title="الحساب الحالي ما عنده صلاحية إدارة" action="العودة للموقع" onAction={() => (window.location.href = "/")} />;
 
   return (
@@ -60,6 +61,23 @@ function AdminLoading() {
   return <div className="admin-loading"><Loader2 size={24} className="is-spinning" /> جاري تحميل لوحة الإدارة...</div>;
 }
 
-function AdminGate({ title, action, onAction }: { title: string; action: string; onAction: () => void }) {
-  return <div className="admin-gate" dir="rtl"><LockKeyhole size={32} /><h1>{title}</h1><button className="button button-primary" onClick={onAction}>{action}<Check size={17} /></button></div>;
+function AdminGate({ title, action, onAction, children }: { title: string; action: string; onAction: () => void; children?: ReactNode }) {
+  return <div className="admin-gate" dir="rtl"><LockKeyhole size={32} /><h1>{title}</h1><button className="button button-primary" onClick={onAction}>{action}<Check size={17} /></button>{children}</div>;
+}
+
+function LocalAdminLogin() {
+  const [username, setUsername] = useState("mjtop249@gmail.com");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const login = trpc.auth.loginLocal.useMutation({
+    onSuccess: () => window.location.reload(),
+    onError: (cause) => setError(cause.message),
+  });
+
+  return <form className="admin-local-login" onSubmit={(event) => { event.preventDefault(); setError(""); login.mutate({ username, password }); }}>
+    <label>أو الدخول المحلي للإدارة<input value={username} onChange={(event) => setUsername(event.target.value)} autoComplete="username" /></label>
+    <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="كلمة المرور" autoComplete="current-password" />
+    <button className="button button-ghost" type="submit" disabled={login.isPending}>{login.isPending ? "جاري التحقق..." : "دخول محلي"}</button>
+    {error && <small role="alert">{error}</small>}
+  </form>;
 }

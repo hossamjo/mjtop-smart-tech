@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { COOKIE_NAME } from "@shared/const";
+import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { adminProcedure, publicProcedure, router } from "./_core/trpc";
@@ -9,9 +9,15 @@ import {
   listContactMessages,
   updateContactMessageEmailStatus,
   updateContactMessageStatus,
+  createGuestUser,
+  createLocalAdmin,
+  getUserByEmail,
 } from "./db";
 import { sendContactNotification } from "./email";
-import { checkContactRateLimit, getClientFingerprint } from "./rateLimit";
+import { checkContactRateLimit, checkLoginRateLimit, getClientFingerprint } from "./rateLimit";
+import { normalizeUsername, verifyPassword } from "./localAuth";
+import { ENV } from "./_core/env";
+import { sdk } from "./_core/sdk";
 
 export const contactInput = z.object({
   name: z.string().trim().min(2).max(150),
@@ -25,6 +31,43 @@ export const appRouter = router({
   system: systemRouter,
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
+    providers: publicProcedure.query(() => ({
+      local: Boolean(ENV.adminPasswordHash),
+      google: Boolean(ENV.googleClientId && ENV.googleClientSecret),
+      facebook: Boolean(ENV.facebookAppId && ENV.facebookAppSecret),
+      guest: true,
+    })),
+    loginLocal: publicProcedure
+      .input(z.object({ username: z.string().trim().min(3).max(320), password: z.string().min(1).max(256) }))
+      .mutation(async ({ input, ctx }) => {
+        const limit = checkLoginRateLimit(getClientFingerprint(ctx.req));
+        if (!limit.allowed) {
+          throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: `محاولات كثيرة. حاول بعد ${limit.retryAfterSeconds} ثانية.` });
+        }
+        if (!ENV.adminPasswordHash) {
+          throw new TRPCError({ code: "PRECONDITION_FAILED", message: "المصادقة المحلية غير مفعّلة بعد. أضف ADMIN_PASSWORD_HASH إلى الأسرار." });
+        }
+
+        const username = normalizeUsername(input.username);
+        let user = await getUserByEmail(username);
+        if (!user && username === normalizeUsername(ENV.adminUsername)) {
+          user = await createLocalAdmin(username, ENV.adminPasswordHash);
+        }
+        if (!user || user.role !== "admin" || !(await verifyPassword(input.password, user.passwordHash))) {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "بيانات الدخول غير صحيحة." });
+        }
+
+        const token = await sdk.createSessionToken(user.openId, { name: user.name || user.email || username });
+        ctx.res.cookie(COOKIE_NAME, token, { ...getSessionCookieOptions(ctx.req), maxAge: ONE_YEAR_MS });
+        return { success: true, user: { id: user.id, name: user.name, email: user.email, role: user.role, authProvider: user.authProvider } };
+      }),
+    loginGuest: publicProcedure.mutation(async ({ ctx }) => {
+      const user = await createGuestUser();
+      if (!user) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "تعذر إنشاء جلسة الضيف." });
+      const token = await sdk.createSessionToken(user.openId, { name: user.name || "Guest User" });
+      ctx.res.cookie(COOKIE_NAME, token, { ...getSessionCookieOptions(ctx.req), maxAge: 24 * 60 * 60 * 1000 });
+      return { success: true, user: { id: user.id, name: user.name, email: user.email, role: user.role, authProvider: user.authProvider } };
+    }),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
