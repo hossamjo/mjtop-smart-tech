@@ -25,6 +25,8 @@ import {
   Zap,
 } from "lucide-react";
 
+const primaryEmail = "mjtop294@gmail.com";
+
 const services = [
   {
     icon: BrainCircuit,
@@ -345,7 +347,7 @@ export default function Home() {
               <h2>عندك تحدّي؟<br /><span>خلّينا نفكّر فيه.</span></h2>
               <p>أرسل لينا نبذة بسيطة. ما محتاج تكون عارف الحل — دي شغلتنا.</p>
               <div className="contact-details">
-                <a href="mailto:hello@mjtop.tech"><Mail size={17} /> hello@mjtop.tech</a>
+                <a href={`mailto:${primaryEmail}`}><Mail size={17} /> {primaryEmail}</a>
                 <span><MapPin size={17} /> الدوحة · قطر</span>
               </div>
             </div>
@@ -380,7 +382,7 @@ export default function Home() {
           </a>
           <p>نصمّم مستقبل أذكى،<br /><span>مع الناس البتصنعه.</span></p>
           <div className="footer-socials">
-            <a href="mailto:hello@mjtop.tech" aria-label="البريد الإلكتروني"><Mail size={18} /></a>
+            <a href={`mailto:${primaryEmail}`} aria-label={`البريد الإلكتروني ${primaryEmail}`}><Mail size={18} /></a>
             <a href="#contact" aria-label="تواصل معنا"><Phone size={18} /></a>
             <a href="#top" aria-label="لينكدإن"><Linkedin size={18} /></a>
             <a href="#top" aria-label="إنستغرام"><Instagram size={18} /></a>
