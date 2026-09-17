@@ -94,3 +94,12 @@ BASE_URL=https://your-production-domain.example pnpm test:performance
 لا يُنصح بتشغيل k6 على `contact.submit` في الإنتاج قبل إضافة test recipient أو feature flag، لأن المسار يكتب في قاعدة البيانات ويرسل بريداً. يلزم تنفيذ الاختبار في نافذة متفق عليها مع مراقبة CPU وRAM وMySQL connections وResend response rate و4xx/5xx وp95/p99.
 
 قبل اعتماد الإنتاج، يجب فحص شهادة النطاق النهائي وسلسلة TLS وTLS 1.2/1.3 وغياب cipher suites الضعيفة بواسطة أداة خارجية، ثم إعادة تنفيذ load/stress/spike/soak وRecovery على نسخة مراقبة. عند إضافة local password authentication مستقبلاً، يجب إضافة اختبارات password hashing وreset tokens وMFA وsession rotation وconcurrent sessions.
+
+
+## 7. نتائج الفحص المنشور في هذه الجولة
+
+تم تنفيذ DAST غير تدميري على HTTPS Preview عبر `tests/security/dast.mjs`. شمل الفحص المسارات الرئيسية وصفحات الخدمات ولوحة الإدارة، وطلب API الإداري بدون جلسة، وفحص CSP وHSTS و`nosniff` وReferrer-Policy، واختباراً محدوداً لمسار traversal بدون قراءة أو تعديل بيانات. النتيجة: **0 Failures و0 Findings** على عنوان Preview المستخدم.
+
+تمت محاولة بدء فحص Qualys SSL Labs API للنطاق المنشور `mjtoptech-yyqcfset.manus.space`، لكن API أعاد HTTP 400 ولم يبدأ التقييم. لذلك لا يمكن اعتبار TLS Grade أو تفاصيل الشهادة وCipher Suites مقاسة حالياً. القيد موثق إلى حين استخدام نطاق عام قابل للوصول من خوادم SSL Labs، مثل نطاق الشركة الرسمي بعد ربط DNS وHTTPS.
+
+بناءً على طلب المالك، **لم يتم تشغيل اختبار k6 الكامل** على الموقع الحي. سيناريو k6 ما زال جاهزاً للتشغيل بعد تأكيد نافذة الاختبار، لكنه لم ينتج نتائج حمل جديدة في هذه الجولة.

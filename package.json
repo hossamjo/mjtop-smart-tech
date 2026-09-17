@@ -11,6 +11,7 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:security": "node tests/security/smoke.mjs",
+    "test:dast": "node tests/security/dast.mjs",
     "test:performance:local": "node tests/performance/local-load.mjs",
     "test:performance": "k6 run tests/performance/contact-form.k6.js",
     "db:push": "drizzle-kit generate && drizzle-kit migrate"
