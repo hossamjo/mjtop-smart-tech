@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1789628667515,
+      "tag": "0000_tired_king_bedlam",
+      "breakpoints": true
+    }
+  ]
+}

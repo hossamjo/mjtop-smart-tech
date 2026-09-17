@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { trpc } from "@/lib/trpc";
 import {
   ArrowLeft,
   ArrowUpLeft,
@@ -85,6 +86,9 @@ export default function Home() {
   const [activeService, setActiveService] = useState(0);
   const [sent, setSent] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const submitContact = trpc.contact.submit.useMutation({
+    onSuccess: () => setSent(true),
+  });
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -103,7 +107,18 @@ export default function Home() {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSent(true);
+    const data = new FormData(event.currentTarget);
+    const value = (key: string) => {
+      const item = data.get(key);
+      return typeof item === "string" ? item : "";
+    };
+    submitContact.mutate({
+      name: value("name"),
+      contact: value("contact"),
+      service: value("service"),
+      message: value("message"),
+      website: value("website"),
+    });
   };
 
   const ActiveServiceIcon = services[activeService].icon;
@@ -364,9 +379,13 @@ export default function Home() {
                   <div className="form-heading"><span>01</span><h3>خلّينا نتعارف</h3></div>
                   <label>اسمك الكريم<input required name="name" placeholder="مثلاً: محمد أحمد" /></label>
                   <label>البريد الإلكتروني أو الهاتف<input required name="contact" placeholder="كيف نتواصل معاك؟" /></label>
-                  <label>نوع المساعدة<select defaultValue=""><option value="" disabled>اختار المجال الأقرب</option><option>أتمتة وذكاء اصطناعي</option><option>أمن سيبراني</option><option>سحابة وبنية تحتية</option><option>تكامل أنظمة وبيانات</option></select></label>
+                  <label>نوع المساعدة<select name="service" defaultValue=""><option value="" disabled>اختار المجال الأقرب</option><option>أتمتة وذكاء اصطناعي</option><option>أمن سيبراني</option><option>سحابة وبنية تحتية</option><option>تكامل أنظمة وبيانات</option></select></label>
                   <label>احكِ لينا عن التحدي<textarea required name="message" rows={3} placeholder="شنو الحاجة العايز تطورها أو تحلّها؟" /></label>
-                  <button className="button button-primary form-submit" type="submit">أرسل الرسالة <Send size={17} /></button>
+                  <input name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="honeypot" />
+                  {submitContact.error && <p className="form-error" role="alert">{submitContact.error.message}</p>}
+                  <button className="button button-primary form-submit" type="submit" disabled={submitContact.isPending}>
+                    {submitContact.isPending ? "جاري الإرسال..." : "أرسل الرسالة"} <Send size={17} />
+                  </button>
                 </>
               )}
             </form>
