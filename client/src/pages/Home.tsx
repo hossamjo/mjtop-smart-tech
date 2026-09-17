@@ -200,7 +200,7 @@ export default function Home() {
               <button type="button" className="auth-provider" disabled={!authProviders.data?.facebook}>Facebook <small>{authProviders.data?.facebook ? "متاح" : "Placeholder"}</small></button>
             </div>
             <form className="auth-form" onSubmit={(event) => { event.preventDefault(); setAuthMessage(""); loginLocal.mutate({ username, password }); }}>
-              <label>اسم المستخدم<input value={username} onChange={(event) => setUsername(event.target.value)} placeholder="mjtop249@gmail.com" autoComplete="username" /></label>
+              <label>البريد الإداري<input value={username} onChange={(event) => setUsername(event.target.value)} placeholder="أدخل بريد الإدارة" autoComplete="username" /></label>
               <label>كلمة المرور<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="أدخل كلمة المرور" autoComplete="current-password" /></label>
               <button className="button button-primary" type="submit" disabled={loginLocal.isPending || !authProviders.data?.local}>{loginLocal.isPending ? "جاري التحقق..." : "دخول الإدارة"}</button>
             </form>
