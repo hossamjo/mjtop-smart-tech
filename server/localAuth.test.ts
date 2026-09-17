@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { hashPassword, isStrongEnoughPassword, verifyPassword } from "./localAuth";
+import {
+  hashPassword,
+  isStrongEnoughPassword,
+  verifyPassword,
+} from "./localAuth";
 import { appRouter } from "./routers";
 import type { TrpcContext } from "./_core/context";
 
@@ -18,7 +22,11 @@ describe("local authentication", () => {
   });
 
   it("exposes guest access while OAuth providers remain placeholders", async () => {
-    const ctx = { user: null, req: {} as TrpcContext["req"], res: {} as TrpcContext["res"] };
+    const ctx = {
+      user: null,
+      req: {} as TrpcContext["req"],
+      res: {} as TrpcContext["res"],
+    };
     const providers = await appRouter.createCaller(ctx).auth.providers();
     expect(providers.guest).toBe(true);
     expect(providers.google).toBe(false);

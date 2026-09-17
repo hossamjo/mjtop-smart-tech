@@ -1,4 +1,8 @@
-import { randomBytes, scrypt as scryptCallback, timingSafeEqual } from "node:crypto";
+import {
+  randomBytes,
+  scrypt as scryptCallback,
+  timingSafeEqual,
+} from "node:crypto";
 import { promisify } from "node:util";
 
 const scrypt = promisify(scryptCallback);
@@ -11,7 +15,10 @@ export async function hashPassword(password: string): Promise<string> {
   return `${SCRYPT_PREFIX}$${salt}$${derived.toString("hex")}`;
 }
 
-export async function verifyPassword(password: string, encoded: string | null | undefined): Promise<boolean> {
+export async function verifyPassword(
+  password: string,
+  encoded: string | null | undefined
+): Promise<boolean> {
   if (!encoded) return false;
   const [prefix, salt, hash] = encoded.split("$");
   if (prefix !== SCRYPT_PREFIX || !salt || !hash) return false;
@@ -19,7 +26,9 @@ export async function verifyPassword(password: string, encoded: string | null | 
   try {
     const expected = Buffer.from(hash, "hex");
     const actual = (await scrypt(password, salt, expected.length)) as Buffer;
-    return expected.length === actual.length && timingSafeEqual(expected, actual);
+    return (
+      expected.length === actual.length && timingSafeEqual(expected, actual)
+    );
   } catch {
     return false;
   }

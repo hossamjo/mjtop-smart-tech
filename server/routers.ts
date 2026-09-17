@@ -14,10 +14,32 @@ import {
   getUserByEmail,
 } from "./db";
 import { sendContactNotification } from "./email";
-import { checkContactRateLimit, checkLoginRateLimit, getClientFingerprint } from "./rateLimit";
+import {
+  checkContactRateLimit,
+  checkLoginRateLimit,
+  getClientFingerprint,
+} from "./rateLimit";
 import { normalizeUsername, verifyPassword } from "./localAuth";
 import { ENV } from "./_core/env";
 import { sdk } from "./_core/sdk";
+import type { User } from "../drizzle/schema";
+
+const GUEST_SESSION_MS = 24 * 60 * 60 * 1000;
+
+const localLoginInput = z.object({
+  username: z.string().trim().min(3).max(320),
+  password: z.string().min(1).max(256),
+});
+
+function toAuthUser(user: User) {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    authProvider: user.authProvider,
+  };
+}
 
 export const contactInput = z.object({
   name: z.string().trim().min(2).max(150),
@@ -38,14 +60,21 @@ export const appRouter = router({
       guest: true,
     })),
     loginLocal: publicProcedure
-      .input(z.object({ username: z.string().trim().min(3).max(320), password: z.string().min(1).max(256) }))
+      .input(localLoginInput)
       .mutation(async ({ input, ctx }) => {
         const limit = checkLoginRateLimit(getClientFingerprint(ctx.req));
         if (!limit.allowed) {
-          throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: `محاولات كثيرة. حاول بعد ${limit.retryAfterSeconds} ثانية.` });
+          throw new TRPCError({
+            code: "TOO_MANY_REQUESTS",
+            message: `محاولات كثيرة. حاول بعد ${limit.retryAfterSeconds} ثانية.`,
+          });
         }
         if (!ENV.adminPasswordHash) {
-          throw new TRPCError({ code: "PRECONDITION_FAILED", message: "المصادقة المحلية غير مفعّلة بعد. أضف ADMIN_PASSWORD_HASH إلى الأسرار." });
+          throw new TRPCError({
+            code: "PRECONDITION_FAILED",
+            message:
+              "المصادقة المحلية غير مفعّلة بعد. أضف ADMIN_PASSWORD_HASH إلى الأسرار.",
+          });
         }
 
         const username = normalizeUsername(input.username);
@@ -53,20 +82,41 @@ export const appRouter = router({
         if (!user && username === normalizeUsername(ENV.adminUsername)) {
           user = await createLocalAdmin(username, ENV.adminPasswordHash);
         }
-        if (!user || user.role !== "admin" || !(await verifyPassword(input.password, user.passwordHash))) {
-          throw new TRPCError({ code: "UNAUTHORIZED", message: "بيانات الدخول غير صحيحة." });
+        if (
+          !user ||
+          user.role !== "admin" ||
+          !(await verifyPassword(input.password, user.passwordHash))
+        ) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "بيانات الدخول غير صحيحة.",
+          });
         }
 
-        const token = await sdk.createSessionToken(user.openId, { name: user.name || user.email || username });
-        ctx.res.cookie(COOKIE_NAME, token, { ...getSessionCookieOptions(ctx.req), maxAge: ONE_YEAR_MS });
-        return { success: true, user: { id: user.id, name: user.name, email: user.email, role: user.role, authProvider: user.authProvider } };
+        const token = await sdk.createSessionToken(user.openId, {
+          name: user.name || user.email || username,
+        });
+        ctx.res.cookie(COOKIE_NAME, token, {
+          ...getSessionCookieOptions(ctx.req),
+          maxAge: ONE_YEAR_MS,
+        });
+        return { success: true, user: toAuthUser(user) };
       }),
     loginGuest: publicProcedure.mutation(async ({ ctx }) => {
       const user = await createGuestUser();
-      if (!user) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "تعذر إنشاء جلسة الضيف." });
-      const token = await sdk.createSessionToken(user.openId, { name: user.name || "Guest User" });
-      ctx.res.cookie(COOKIE_NAME, token, { ...getSessionCookieOptions(ctx.req), maxAge: 24 * 60 * 60 * 1000 });
-      return { success: true, user: { id: user.id, name: user.name, email: user.email, role: user.role, authProvider: user.authProvider } };
+      if (!user)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "تعذر إنشاء جلسة الضيف.",
+        });
+      const token = await sdk.createSessionToken(user.openId, {
+        name: user.name || "Guest User",
+      });
+      ctx.res.cookie(COOKIE_NAME, token, {
+        ...getSessionCookieOptions(ctx.req),
+        maxAge: GUEST_SESSION_MS,
+      });
+      return { success: true, user: toAuthUser(user) };
     }),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
@@ -76,48 +126,57 @@ export const appRouter = router({
   }),
 
   contact: router({
-    submit: publicProcedure.input(contactInput).mutation(async ({ input, ctx }) => {
-      if (input.website?.trim()) {
-        return { success: true, emailStatus: "skipped" as const };
-      }
+    submit: publicProcedure
+      .input(contactInput)
+      .mutation(async ({ input, ctx }) => {
+        if (input.website?.trim()) {
+          return { success: true, emailStatus: "skipped" as const };
+        }
 
-      const fingerprint = getClientFingerprint(ctx.req);
-      const limit = checkContactRateLimit(fingerprint);
-      if (!limit.allowed) {
-        throw new TRPCError({
-          code: "TOO_MANY_REQUESTS",
-          message: `طلبات كثيرة. حاول بعد ${limit.retryAfterSeconds} ثانية.`,
+        const fingerprint = getClientFingerprint(ctx.req);
+        const limit = checkContactRateLimit(fingerprint);
+        if (!limit.allowed) {
+          throw new TRPCError({
+            code: "TOO_MANY_REQUESTS",
+            message: `طلبات كثيرة. حاول بعد ${limit.retryAfterSeconds} ثانية.`,
+          });
+        }
+
+        const created = await createContactMessage({
+          name: input.name,
+          contact: input.contact,
+          service: input.service || null,
+          message: input.message,
+          ipHash: fingerprint,
+          userAgent: ctx.req.get("user-agent")?.slice(0, 255) || null,
+          emailStatus: "pending",
         });
-      }
 
-      const created = await createContactMessage({
-        name: input.name,
-        contact: input.contact,
-        service: input.service || null,
-        message: input.message,
-        ipHash: fingerprint,
-        userAgent: ctx.req.get("user-agent")?.slice(0, 255) || null,
-        emailStatus: "pending",
-      });
-
-      try {
-        const result = await sendContactNotification(input);
-        const emailStatus = result.sent ? "sent" : "skipped";
-        await updateContactMessageEmailStatus(created.id, emailStatus);
-        return { success: true, emailStatus } as const;
-      } catch (error) {
-        console.error("[Contact] Email delivery failed:", error);
-        await updateContactMessageEmailStatus(created.id, "failed");
-        return { success: true, emailStatus: "failed" as const };
-      }
-    }),
+        try {
+          const result = await sendContactNotification(input);
+          const emailStatus = result.sent ? "sent" : "skipped";
+          await updateContactMessageEmailStatus(created.id, emailStatus);
+          return { success: true, emailStatus } as const;
+        } catch (error) {
+          console.error("[Contact] Email delivery failed:", error);
+          await updateContactMessageEmailStatus(created.id, "failed");
+          return { success: true, emailStatus: "failed" as const };
+        }
+      }),
   }),
 
   admin: router({
     messages: adminProcedure.query(async () => listContactMessages()),
     updateMessageStatus: adminProcedure
-      .input(z.object({ id: z.number().int().positive(), status: z.enum(["new", "read", "replied", "archived"]) }))
-      .mutation(({ input }) => updateContactMessageStatus(input.id, input.status)),
+      .input(
+        z.object({
+          id: z.number().int().positive(),
+          status: z.enum(["new", "read", "replied", "archived"]),
+        })
+      )
+      .mutation(({ input }) =>
+        updateContactMessageStatus(input.id, input.status)
+      ),
   }),
 });
 

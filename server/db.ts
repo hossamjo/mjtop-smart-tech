@@ -1,8 +1,14 @@
 import { desc, eq } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 import { drizzle } from "drizzle-orm/mysql2";
-import { ContactMessage, contactMessages, InsertContactMessage, InsertUser, users } from "../drizzle/schema";
-import { ENV } from './_core/env';
+import {
+  ContactMessage,
+  contactMessages,
+  InsertContactMessage,
+  InsertUser,
+  users,
+} from "../drizzle/schema";
+import { ENV } from "./_core/env";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -57,8 +63,8 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       values.role = user.role;
       updateSet.role = user.role;
     } else if (user.openId === ENV.ownerOpenId) {
-      values.role = 'admin';
-      updateSet.role = 'admin';
+      values.role = "admin";
+      updateSet.role = "admin";
     }
 
     if (!values.lastSignedIn) {
@@ -85,7 +91,11 @@ export async function getUserByOpenId(openId: string) {
     return undefined;
   }
 
-  const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
+  const result = await db
+    .select()
+    .from(users)
+    .where(eq(users.openId, openId))
+    .limit(1);
 
   return result.length > 0 ? result[0] : undefined;
 }
@@ -93,7 +103,11 @@ export async function getUserByOpenId(openId: string) {
 export async function getUserByEmail(email: string) {
   const db = await getDb();
   if (!db) return undefined;
-  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  const result = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, email))
+    .limit(1);
   return result[0];
 }
 
@@ -131,12 +145,21 @@ export async function createGuestUser() {
   return getUserByOpenId(openId);
 }
 
-export async function createContactMessage(message: InsertContactMessage): Promise<ContactMessage> {
+export async function createContactMessage(
+  message: InsertContactMessage
+): Promise<ContactMessage> {
   const db = await getDb();
   if (!db) throw new Error("Database is not configured");
 
-  const result = await db.insert(contactMessages).values(message).$returningId();
-  const created = await db.select().from(contactMessages).where(eq(contactMessages.id, result[0].id)).limit(1);
+  const result = await db
+    .insert(contactMessages)
+    .values(message)
+    .$returningId();
+  const created = await db
+    .select()
+    .from(contactMessages)
+    .where(eq(contactMessages.id, result[0].id))
+    .limit(1);
   if (!created[0]) throw new Error("Failed to create contact message");
   return created[0];
 }
@@ -144,19 +167,38 @@ export async function createContactMessage(message: InsertContactMessage): Promi
 export async function listContactMessages(): Promise<ContactMessage[]> {
   const db = await getDb();
   if (!db) throw new Error("Database is not configured");
-  return db.select().from(contactMessages).orderBy(desc(contactMessages.createdAt));
+  return db
+    .select()
+    .from(contactMessages)
+    .orderBy(desc(contactMessages.createdAt));
 }
 
-export async function updateContactMessageStatus(id: number, status: ContactMessage["status"]) {
+export async function updateContactMessageStatus(
+  id: number,
+  status: ContactMessage["status"]
+) {
   const db = await getDb();
   if (!db) throw new Error("Database is not configured");
-  await db.update(contactMessages).set({ status }).where(eq(contactMessages.id, id));
-  const updated = await db.select().from(contactMessages).where(eq(contactMessages.id, id)).limit(1);
+  await db
+    .update(contactMessages)
+    .set({ status })
+    .where(eq(contactMessages.id, id));
+  const updated = await db
+    .select()
+    .from(contactMessages)
+    .where(eq(contactMessages.id, id))
+    .limit(1);
   return updated[0];
 }
 
-export async function updateContactMessageEmailStatus(id: number, emailStatus: ContactMessage["emailStatus"]) {
+export async function updateContactMessageEmailStatus(
+  id: number,
+  emailStatus: ContactMessage["emailStatus"]
+) {
   const db = await getDb();
   if (!db) throw new Error("Database is not configured");
-  await db.update(contactMessages).set({ emailStatus }).where(eq(contactMessages.id, id));
+  await db
+    .update(contactMessages)
+    .set({ emailStatus })
+    .where(eq(contactMessages.id, id));
 }

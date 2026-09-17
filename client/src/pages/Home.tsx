@@ -69,10 +69,26 @@ const services = [
 ];
 
 const processSteps = [
-  { number: "01", title: "نسمع", text: "نفهم واقعك، أولوياتك، والنتيجة البتفتش عليها." },
-  { number: "02", title: "نصمّم", text: "نحوّل التحدي إلى مسار تقني واضح وقابل للتنفيذ." },
-  { number: "03", title: "نبني", text: "نطوّر الحل وندمجه مع فريقك وبيئتك الحالية." },
-  { number: "04", title: "نطوّر", text: "نقيس الأثر ونحسّن الحل مع نمو احتياجك." },
+  {
+    number: "01",
+    title: "نسمع",
+    text: "نفهم واقعك، أولوياتك، والنتيجة البتفتش عليها.",
+  },
+  {
+    number: "02",
+    title: "نصمّم",
+    text: "نحوّل التحدي إلى مسار تقني واضح وقابل للتنفيذ.",
+  },
+  {
+    number: "03",
+    title: "نبني",
+    text: "نطوّر الحل وندمجه مع فريقك وبيئتك الحالية.",
+  },
+  {
+    number: "04",
+    title: "نطوّر",
+    text: "نقيس الأثر ونحسّن الحل مع نمو احتياجك.",
+  },
 ];
 
 const navItems = [
@@ -93,12 +109,17 @@ export default function Home() {
   const [authMessage, setAuthMessage] = useState("");
   const authProviders = trpc.auth.providers.useQuery();
   const loginLocal = trpc.auth.loginLocal.useMutation({
-    onSuccess: () => { setAuthMessage("تم تسجيل الدخول بنجاح."); setPassword(""); },
-    onError: (error) => setAuthMessage(error.message),
+    onSuccess: () => {
+      setAuthMessage("تم تسجيل الدخول بنجاح.");
+      setPassword("");
+    },
+    onError: error => setAuthMessage(error.message),
   });
   const loginGuest = trpc.auth.loginGuest.useMutation({
-    onSuccess: () => { setAuthMessage("دخلت كضيف. بعض خصائص الإدارة غير متاحة للضيف."); },
-    onError: (error) => setAuthMessage(error.message),
+    onSuccess: () => {
+      setAuthMessage("دخلت كضيف. بعض خصائص الإدارة غير متاحة للضيف.");
+    },
+    onError: error => setAuthMessage(error.message),
   });
   const submitContact = trpc.contact.submit.useMutation({
     onSuccess: () => setSent(true),
@@ -145,7 +166,12 @@ export default function Home() {
 
       <header className={`site-header ${scrolled ? "is-scrolled" : ""}`}>
         <div className="container header-inner">
-          <a className="brand" href="#top" aria-label="MjTop - الرئيسية" onClick={closeMenu}>
+          <a
+            className="brand"
+            href="#top"
+            aria-label="MjTop - الرئيسية"
+            onClick={closeMenu}
+          >
             <span className="brand-mark" aria-hidden="true">
               <span>Mj</span>
               <i />
@@ -156,8 +182,12 @@ export default function Home() {
             </span>
           </a>
 
-          <nav id="main-navigation" className={`main-nav ${menuOpen ? "is-open" : ""}`} aria-label="التنقل الرئيسي">
-            {navItems.map((item) => (
+          <nav
+            id="main-navigation"
+            className={`main-nav ${menuOpen ? "is-open" : ""}`}
+            aria-label="التنقل الرئيسي"
+          >
+            {navItems.map(item => (
               <a key={item.href} href={item.href} onClick={closeMenu}>
                 {item.label}
               </a>
@@ -171,7 +201,11 @@ export default function Home() {
             <a className="header-cta" href="#contact" onClick={closeMenu}>
               ابدأ حواراً <ArrowUpLeft size={17} aria-hidden="true" />
             </a>
-            <button className="auth-trigger" type="button" onClick={() => setAuthOpen(true)}>
+            <button
+              className="auth-trigger"
+              type="button"
+              onClick={() => setAuthOpen(true)}
+            >
               <LogIn size={16} aria-hidden="true" /> دخول
             </button>
             <button
@@ -180,7 +214,7 @@ export default function Home() {
               aria-expanded={menuOpen}
               aria-controls="main-navigation"
               aria-label={menuOpen ? "إغلاق القائمة" : "فتح القائمة"}
-              onClick={() => setMenuOpen((open) => !open)}
+              onClick={() => setMenuOpen(open => !open)}
             >
               {menuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
@@ -189,23 +223,99 @@ export default function Home() {
       </header>
 
       {authOpen && (
-        <div className="auth-overlay" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+        <div
+          className="auth-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="auth-title"
+        >
           <div className="auth-card">
-            <button className="auth-close" type="button" aria-label="إغلاق" onClick={() => setAuthOpen(false)}><X size={18} /></button>
-            <div className="eyebrow"><span className="eyebrow-dot" /> حساب MjTop</div>
-            <h2 id="auth-title">سجّل دخولك بالطريقة المناسبة</h2>
-            <p>Google وFacebook جاهزان كتكاملات placeholder إلى حين إضافة مفاتيح OAuth.</p>
-            <div className="auth-provider-row">
-              <button type="button" className="auth-provider" disabled={!authProviders.data?.google}>Google <small>{authProviders.data?.google ? "متاح" : "Placeholder"}</small></button>
-              <button type="button" className="auth-provider" disabled={!authProviders.data?.facebook}>Facebook <small>{authProviders.data?.facebook ? "متاح" : "Placeholder"}</small></button>
+            <button
+              className="auth-close"
+              type="button"
+              aria-label="إغلاق"
+              onClick={() => setAuthOpen(false)}
+            >
+              <X size={18} />
+            </button>
+            <div className="eyebrow">
+              <span className="eyebrow-dot" /> حساب MjTop
             </div>
-            <form className="auth-form" onSubmit={(event) => { event.preventDefault(); setAuthMessage(""); loginLocal.mutate({ username, password }); }}>
-              <label>البريد الإداري<input value={username} onChange={(event) => setUsername(event.target.value)} placeholder="أدخل بريد الإدارة" autoComplete="username" /></label>
-              <label>كلمة المرور<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} placeholder="أدخل كلمة المرور" autoComplete="current-password" /></label>
-              <button className="button button-primary" type="submit" disabled={loginLocal.isPending || !authProviders.data?.local}>{loginLocal.isPending ? "جاري التحقق..." : "دخول الإدارة"}</button>
+            <h2 id="auth-title">سجّل دخولك بالطريقة المناسبة</h2>
+            <p>
+              Google وFacebook جاهزان كتكاملات placeholder إلى حين إضافة مفاتيح
+              OAuth.
+            </p>
+            <div className="auth-provider-row">
+              <button
+                type="button"
+                className="auth-provider"
+                disabled={!authProviders.data?.google}
+              >
+                Google{" "}
+                <small>
+                  {authProviders.data?.google ? "متاح" : "Placeholder"}
+                </small>
+              </button>
+              <button
+                type="button"
+                className="auth-provider"
+                disabled={!authProviders.data?.facebook}
+              >
+                Facebook{" "}
+                <small>
+                  {authProviders.data?.facebook ? "متاح" : "Placeholder"}
+                </small>
+              </button>
+            </div>
+            <form
+              className="auth-form"
+              onSubmit={event => {
+                event.preventDefault();
+                setAuthMessage("");
+                loginLocal.mutate({ username, password });
+              }}
+            >
+              <label>
+                البريد الإداري
+                <input
+                  value={username}
+                  onChange={event => setUsername(event.target.value)}
+                  placeholder="أدخل بريد الإدارة"
+                  autoComplete="username"
+                />
+              </label>
+              <label>
+                كلمة المرور
+                <input
+                  type="password"
+                  value={password}
+                  onChange={event => setPassword(event.target.value)}
+                  placeholder="أدخل كلمة المرور"
+                  autoComplete="current-password"
+                />
+              </label>
+              <button
+                className="button button-primary"
+                type="submit"
+                disabled={loginLocal.isPending || !authProviders.data?.local}
+              >
+                {loginLocal.isPending ? "جاري التحقق..." : "دخول الإدارة"}
+              </button>
             </form>
-            <button className="guest-button" type="button" onClick={() => loginGuest.mutate()} disabled={loginGuest.isPending}>الدخول كضيف</button>
-            {authMessage && <p className="auth-message" role="status">{authMessage}</p>}
+            <button
+              className="guest-button"
+              type="button"
+              onClick={() => loginGuest.mutate()}
+              disabled={loginGuest.isPending}
+            >
+              الدخول كضيف
+            </button>
+            {authMessage && (
+              <p className="auth-message" role="status">
+                {authMessage}
+              </p>
+            )}
           </div>
         </div>
       )}
@@ -228,7 +338,8 @@ export default function Home() {
                 <em>خلّها تكون ميزتك.</em>
               </h1>
               <p>
-                في MjTop بنحوّل التعقيد التقني إلى حلول ذكية، مرنة، ومصمّمة عشان تخلّي عملك يتقدّم بثقة.
+                في MjTop بنحوّل التعقيد التقني إلى حلول ذكية، مرنة، ومصمّمة عشان
+                تخلّي عملك يتقدّم بثقة.
               </p>
               <div className="hero-actions">
                 <a className="button button-primary" href="#contact">
@@ -253,17 +364,27 @@ export default function Home() {
 
             <div className="hero-orbit-card">
               <div className="orbit-card-top">
-                <span className="live-dot"><i /> متصل الآن</span>
+                <span className="live-dot">
+                  <i /> متصل الآن
+                </span>
                 <span className="orbit-label">MJ / 001</span>
               </div>
               <div className="orbit-visual" aria-hidden="true">
                 <div className="orbit-ring ring-one" />
                 <div className="orbit-ring ring-two" />
                 <div className="orbit-ring ring-three" />
-                <div className="orbit-core"><Cpu size={34} /></div>
-                <span className="orbit-node node-one"><Zap size={13} /></span>
-                <span className="orbit-node node-two"><Globe2 size={13} /></span>
-                <span className="orbit-node node-three"><Bot size={13} /></span>
+                <div className="orbit-core">
+                  <Cpu size={34} />
+                </div>
+                <span className="orbit-node node-one">
+                  <Zap size={13} />
+                </span>
+                <span className="orbit-node node-two">
+                  <Globe2 size={13} />
+                </span>
+                <span className="orbit-node node-three">
+                  <Bot size={13} />
+                </span>
               </div>
               <div className="orbit-card-bottom">
                 <span>أنظمة تفهمك</span>
@@ -281,11 +402,19 @@ export default function Home() {
           <div className="container signal-inner">
             <span className="signal-kicker">من التحدي إلى الإمكان</span>
             <div className="signal-items">
-              <span><CircleCheck size={16} /> وضوح</span>
-              <span><CircleCheck size={16} /> مرونة</span>
-              <span><CircleCheck size={16} /> أثر</span>
+              <span>
+                <CircleCheck size={16} /> وضوح
+              </span>
+              <span>
+                <CircleCheck size={16} /> مرونة
+              </span>
+              <span>
+                <CircleCheck size={16} /> أثر
+              </span>
             </div>
-            <span className="signal-number">MJ<span>•</span>TOP</span>
+            <span className="signal-number">
+              MJ<span>•</span>TOP
+            </span>
           </div>
         </section>
 
@@ -293,10 +422,19 @@ export default function Home() {
           <div className="container">
             <div className="section-heading services-heading">
               <div>
-                <div className="eyebrow"><span className="eyebrow-dot" /> ما نقدّمه</div>
-                <h2>نخلّي التقنية<br /><span>تشتغل لصالحك.</span></h2>
+                <div className="eyebrow">
+                  <span className="eyebrow-dot" /> ما نقدّمه
+                </div>
+                <h2>
+                  نخلّي التقنية
+                  <br />
+                  <span>تشتغل لصالحك.</span>
+                </h2>
               </div>
-              <p>ما بنبيعك أدوات زيادة. بنصمّم معاك منظومة تقنية أهدأ، أذكى، ومتصلة بهدفك الحقيقي.</p>
+              <p>
+                ما بنبيعك أدوات زيادة. بنصمّم معاك منظومة تقنية أهدأ، أذكى،
+                ومتصلة بهدفك الحقيقي.
+              </p>
             </div>
 
             <div className="services-layout">
@@ -312,27 +450,47 @@ export default function Home() {
                       onClick={() => setActiveService(index)}
                       aria-pressed={isActive}
                     >
-                      <span className={`service-icon tone-${service.tone}`}><Icon size={21} /></span>
+                      <span className={`service-icon tone-${service.tone}`}>
+                        <Icon size={21} />
+                      </span>
                       <span className="service-row-text">
                         <small>{service.index}</small>
                         <strong>{service.title}</strong>
                       </span>
-                      <ArrowLeft className="service-row-arrow" size={19} aria-hidden="true" />
+                      <ArrowLeft
+                        className="service-row-arrow"
+                        size={19}
+                        aria-hidden="true"
+                      />
                     </button>
                   );
                 })}
               </div>
-              <div key={services[activeService].index} className={`service-feature tone-${services[activeService].tone}`}>
+              <div
+                key={services[activeService].index}
+                className={`service-feature tone-${services[activeService].tone}`}
+              >
                 <div className="service-feature-top">
                   <span>خدمة {services[activeService].index}</span>
                   <Sparkles size={19} aria-hidden="true" />
                 </div>
-                <div className="service-feature-icon"><ActiveServiceIcon size={38} /></div>
+                <div className="service-feature-icon">
+                  <ActiveServiceIcon size={38} />
+                </div>
                 <h3>{services[activeService].title}</h3>
                 <p>{services[activeService].description}</p>
-                <a href={`/services/${services[activeService].slug}`}>خلّينا نبدأ من هنا <ArrowUpLeft size={17} /></a>
+                <a href={`/services/${services[activeService].slug}`}>
+                  خلّينا نبدأ من هنا <ArrowUpLeft size={17} />
+                </a>
                 <div className="feature-metric" aria-hidden="true">
-                  <span /><span /><span /><span /><span /><span /><span /><span />
+                  <span />
+                  <span />
+                  <span />
+                  <span />
+                  <span />
+                  <span />
+                  <span />
+                  <span />
                 </div>
               </div>
             </div>
@@ -340,13 +498,26 @@ export default function Home() {
         </section>
 
         <section className="section process-section" id="process">
-          <div className="process-backdrop" aria-hidden="true"><span>MJ</span></div>
+          <div className="process-backdrop" aria-hidden="true">
+            <span>MJ</span>
+          </div>
           <div className="container process-inner">
             <div className="process-intro">
-              <div className="eyebrow"><span className="eyebrow-dot" /> طريقتنا</div>
-              <h2>نشتغل معاك،<br /><span>ما نشتغل بدالك.</span></h2>
-              <p>أفضل الحلول التقنية بتطلع من فهم عميق للمشكلة، وتعاون حقيقي مع الناس البتستخدمها كل يوم.</p>
-              <a className="text-link" href="#contact">تعرّف على طريقتنا <ArrowLeft size={17} /></a>
+              <div className="eyebrow">
+                <span className="eyebrow-dot" /> طريقتنا
+              </div>
+              <h2>
+                نشتغل معاك،
+                <br />
+                <span>ما نشتغل بدالك.</span>
+              </h2>
+              <p>
+                أفضل الحلول التقنية بتطلع من فهم عميق للمشكلة، وتعاون حقيقي مع
+                الناس البتستخدمها كل يوم.
+              </p>
+              <a className="text-link" href="#contact">
+                تعرّف على طريقتنا <ArrowLeft size={17} />
+              </a>
             </div>
             <div className="process-steps">
               {processSteps.map((step, index) => (
@@ -356,7 +527,9 @@ export default function Home() {
                     <h3>{step.title}</h3>
                     <p>{step.text}</p>
                   </div>
-                  {index < processSteps.length - 1 && <span className="process-connector" aria-hidden="true" />}
+                  {index < processSteps.length - 1 && (
+                    <span className="process-connector" aria-hidden="true" />
+                  )}
                 </div>
               ))}
             </div>
@@ -366,9 +539,18 @@ export default function Home() {
         <section className="section values-section">
           <div className="container values-grid">
             <div className="values-copy">
-              <div className="eyebrow"><span className="eyebrow-dot" /> لماذا MjTop</div>
-              <h2>تقنية فيها<br /><span>عقل وقلب.</span></h2>
-              <p>لأن الحل القوي ما بس بيشتغل. بيكون مفهوم، قابل للتوسع، ومبني حول الناس البتستخدمه.</p>
+              <div className="eyebrow">
+                <span className="eyebrow-dot" /> لماذا MjTop
+              </div>
+              <h2>
+                تقنية فيها
+                <br />
+                <span>عقل وقلب.</span>
+              </h2>
+              <p>
+                لأن الحل القوي ما بس بيشتغل. بيكون مفهوم، قابل للتوسع، ومبني حول
+                الناس البتستخدمه.
+              </p>
             </div>
             <div className="value-cards">
               <article className="value-card value-card-dark">
@@ -397,33 +579,104 @@ export default function Home() {
           <div className="contact-noise" aria-hidden="true" />
           <div className="container contact-inner">
             <div className="contact-copy">
-              <div className="eyebrow eyebrow-light"><span className="eyebrow-dot" /> الخطوة الجاية</div>
-              <h2>عندك تحدّي؟<br /><span>خلّينا نفكّر فيه.</span></h2>
+              <div className="eyebrow eyebrow-light">
+                <span className="eyebrow-dot" /> الخطوة الجاية
+              </div>
+              <h2>
+                عندك تحدّي؟
+                <br />
+                <span>خلّينا نفكّر فيه.</span>
+              </h2>
               <p>أرسل لينا نبذة بسيطة. ما محتاج تكون عارف الحل — دي شغلتنا.</p>
               <div className="contact-details">
-                <a href={`mailto:${primaryEmail}`}><Mail size={17} /> {primaryEmail}</a>
-                <span><MapPin size={17} /> الدوحة · قطر</span>
+                <a href={`mailto:${primaryEmail}`}>
+                  <Mail size={17} /> {primaryEmail}
+                </a>
+                <span>
+                  <MapPin size={17} /> الدوحة · قطر
+                </span>
               </div>
             </div>
             <form className="contact-form" onSubmit={handleSubmit}>
               {sent ? (
                 <div className="success-state" role="status">
-                  <div className="success-icon"><Check size={25} /></div>
+                  <div className="success-icon">
+                    <Check size={25} />
+                  </div>
                   <h3>وصلتنا رسالتك.</h3>
                   <p>شكراً لثقتك. حنرجع ليك قريباً عشان نبدأ الحوار.</p>
-                  <button className="button button-dark" type="button" onClick={() => setSent(false)}>إرسال رسالة أخرى</button>
+                  <button
+                    className="button button-dark"
+                    type="button"
+                    onClick={() => setSent(false)}
+                  >
+                    إرسال رسالة أخرى
+                  </button>
                 </div>
               ) : (
                 <>
-                  <div className="form-heading"><span>01</span><h3>خلّينا نتعارف</h3></div>
-                  <label>اسمك الكريم<input required name="name" placeholder="مثلاً: محمد أحمد" /></label>
-                  <label>البريد الإلكتروني أو الهاتف<input required name="contact" placeholder="كيف نتواصل معاك؟" /></label>
-                  <label>نوع المساعدة<select name="service" defaultValue=""><option value="" disabled>اختار المجال الأقرب</option><option>أتمتة وذكاء اصطناعي</option><option>أمن سيبراني</option><option>سحابة وبنية تحتية</option><option>تكامل أنظمة وبيانات</option></select></label>
-                  <label>احكِ لينا عن التحدي<textarea required name="message" rows={3} placeholder="شنو الحاجة العايز تطورها أو تحلّها؟" /></label>
-                  <input name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="honeypot" />
-                  {submitContact.error && <p className="form-error" role="alert">{submitContact.error.message}</p>}
-                  <button className="button button-primary form-submit" type="submit" disabled={submitContact.isPending}>
-                    {submitContact.isPending ? "جاري الإرسال..." : "أرسل الرسالة"} <Send size={17} />
+                  <div className="form-heading">
+                    <span>01</span>
+                    <h3>خلّينا نتعارف</h3>
+                  </div>
+                  <label>
+                    اسمك الكريم
+                    <input
+                      required
+                      name="name"
+                      placeholder="مثلاً: محمد أحمد"
+                    />
+                  </label>
+                  <label>
+                    البريد الإلكتروني أو الهاتف
+                    <input
+                      required
+                      name="contact"
+                      placeholder="كيف نتواصل معاك؟"
+                    />
+                  </label>
+                  <label>
+                    نوع المساعدة
+                    <select name="service" defaultValue="">
+                      <option value="" disabled>
+                        اختار المجال الأقرب
+                      </option>
+                      <option>أتمتة وذكاء اصطناعي</option>
+                      <option>أمن سيبراني</option>
+                      <option>سحابة وبنية تحتية</option>
+                      <option>تكامل أنظمة وبيانات</option>
+                    </select>
+                  </label>
+                  <label>
+                    احكِ لينا عن التحدي
+                    <textarea
+                      required
+                      name="message"
+                      rows={3}
+                      placeholder="شنو الحاجة العايز تطورها أو تحلّها؟"
+                    />
+                  </label>
+                  <input
+                    name="website"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    aria-hidden="true"
+                    className="honeypot"
+                  />
+                  {submitContact.error && (
+                    <p className="form-error" role="alert">
+                      {submitContact.error.message}
+                    </p>
+                  )}
+                  <button
+                    className="button button-primary form-submit"
+                    type="submit"
+                    disabled={submitContact.isPending}
+                  >
+                    {submitContact.isPending
+                      ? "جاري الإرسال..."
+                      : "أرسل الرسالة"}{" "}
+                    <Send size={17} />
                   </button>
                 </>
               )}
@@ -435,20 +688,43 @@ export default function Home() {
       <footer className="site-footer">
         <div className="container footer-top">
           <a className="brand footer-brand" href="#top">
-            <span className="brand-mark" aria-hidden="true"><span>Mj</span><i /></span>
-            <span className="brand-copy"><strong>MjTop</strong><small>SMART TECHNOLOGY</small></span>
+            <span className="brand-mark" aria-hidden="true">
+              <span>Mj</span>
+              <i />
+            </span>
+            <span className="brand-copy">
+              <strong>MjTop</strong>
+              <small>SMART TECHNOLOGY</small>
+            </span>
           </a>
-          <p>نصمّم مستقبل أذكى،<br /><span>مع الناس البتصنعه.</span></p>
+          <p>
+            نصمّم مستقبل أذكى،
+            <br />
+            <span>مع الناس البتصنعه.</span>
+          </p>
           <div className="footer-socials">
-            <a href={`mailto:${primaryEmail}`} aria-label={`البريد الإلكتروني ${primaryEmail}`}><Mail size={18} /></a>
-            <a href="#contact" aria-label="تواصل معنا"><Phone size={18} /></a>
-            <a href="#top" aria-label="لينكدإن"><Linkedin size={18} /></a>
-            <a href="#top" aria-label="إنستغرام"><Instagram size={18} /></a>
+            <a
+              href={`mailto:${primaryEmail}`}
+              aria-label={`البريد الإلكتروني ${primaryEmail}`}
+            >
+              <Mail size={18} />
+            </a>
+            <a href="#contact" aria-label="تواصل معنا">
+              <Phone size={18} />
+            </a>
+            <a href="#top" aria-label="لينكدإن">
+              <Linkedin size={18} />
+            </a>
+            <a href="#top" aria-label="إنستغرام">
+              <Instagram size={18} />
+            </a>
           </div>
         </div>
         <div className="container footer-bottom">
           <span>© 2026 MjTop. كل الحقوق محفوظة.</span>
-          <span>Built for what’s next <span className="footer-star">✦</span></span>
+          <span>
+            Built for what’s next <span className="footer-star">✦</span>
+          </span>
         </div>
       </footer>
     </div>
