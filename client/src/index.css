@@ -1,24 +1,24 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Montserrat:wght@500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 
 :root {
   font-family: "IBM Plex Sans Arabic", sans-serif;
-  color: #16211d;
-  background: #f5f7f3;
+  color: #071c26;
+  background: #edf2f5;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  --ink: #16211d;
-  --ink-soft: #62706a;
-  --night: #071914;
-  --night-soft: #0e2a22;
-  --lime: #c7f36b;
-  --lime-dark: #89b63d;
-  --cyan: #58d8e8;
-  --purple: #b7a0ff;
-  --orange: #ffb46b;
-  --mist: #f5f7f3;
-  --line: rgba(22, 33, 29, 0.13);
+  --ink: #071c26;
+  --ink-soft: #60717b;
+  --night: #002a34;
+  --night-soft: #0a4656;
+  --lime: #00c2ff;
+  --lime-dark: #0088b5;
+  --cyan: #00c2ff;
+  --purple: #5f8dff;
+  --orange: #72d8ff;
+  --mist: #edf2f5;
+  --line: rgba(7, 28, 38, 0.14);
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
@@ -39,7 +39,7 @@ button { border: 0; }
 .site-header.is-scrolled { background: rgba(7, 25, 20, .86); backdrop-filter: blur(18px); box-shadow: 0 8px 30px rgba(0,0,0,.1); }
 .header-inner { display: flex; align-items: center; justify-content: space-between; min-height: 84px; gap: 2rem; }
 .brand { display: inline-flex; align-items: center; gap: .7rem; direction: ltr; }
-.brand-mark { display: grid; place-items: center; position: relative; width: 41px; height: 41px; border: 1px solid rgba(199, 243, 107, .7); border-radius: 12px 12px 12px 4px; color: var(--lime); font-family: "Space Grotesk", sans-serif; font-size: 13px; font-weight: 700; letter-spacing: -1px; transform: rotate(-7deg); }
+.brand-mark { display: grid; place-items: center; position: relative; width: 41px; height: 41px; border: 1px solid rgba(0, 194, 255, .72); border-radius: 12px 12px 12px 4px; color: var(--lime); background: linear-gradient(145deg, rgba(0,194,255,.16), rgba(0,42,52,.34)); font-family: "Montserrat", sans-serif; font-size: 13px; font-weight: 800; letter-spacing: -1px; transform: rotate(-7deg); }
 .brand-mark span { transform: rotate(7deg); }
 .brand-mark i { position: absolute; bottom: 5px; inset-inline-end: 5px; width: 5px; height: 5px; border-radius: 50%; background: var(--lime); }
 .brand-copy { display: flex; flex-direction: column; gap: 1px; line-height: 1; }
@@ -55,11 +55,11 @@ button { border: 0; }
 .menu-toggle { display: none; color: white; background: transparent; cursor: pointer; }
 
 .hero { min-height: 820px; position: relative; isolation: isolate; display: flex; align-items: center; color: white; background: var(--night); }
-.hero-image { position: absolute; z-index: -3; inset: 0; background-image: linear-gradient(90deg, rgba(7,25,20,.08) 0%, rgba(7,25,20,.33) 44%, rgba(7,25,20,.95) 100%), url('/manus-storage/mjtop-hero_89937733.jpg'); background-size: cover; background-position: center; }
+.hero-image { position: absolute; z-index: -3; inset: 0; background-image: linear-gradient(90deg, rgba(0,42,52,.18) 0%, rgba(0,42,52,.45) 44%, rgba(0,22,32,.96) 100%), url('/manus-storage/mjtop-hero_89937733.jpg'); background-size: cover; background-position: center; filter: saturate(.82) hue-rotate(18deg); }
 .hero-grid { position: absolute; z-index: -2; inset: 0; opacity: .16; background-image: linear-gradient(rgba(199,243,107,.3) 1px, transparent 1px), linear-gradient(90deg, rgba(199,243,107,.3) 1px, transparent 1px); background-size: 86px 86px; mask-image: linear-gradient(90deg, black 0%, transparent 78%); }
 .hero-glow { position: absolute; z-index: -1; width: 360px; height: 360px; border-radius: 50%; filter: blur(75px); opacity: .16; }
-.hero-glow-one { background: var(--lime); top: 18%; inset-inline-end: 3%; }
-.hero-glow-two { background: var(--cyan); bottom: -12%; inset-inline-start: 18%; }
+.hero-glow-one { background: var(--cyan); top: 18%; inset-inline-end: 3%; }
+.hero-glow-two { background: #5f8dff; bottom: -12%; inset-inline-start: 18%; }
 .hero-content { display: flex; align-items: center; justify-content: space-between; gap: 2rem; padding-top: 88px; }
 .hero-copy { width: min(580px, 100%); animation: reveal-up .8s var(--ease-out) both; }
 .eyebrow { display: flex; align-items: center; gap: .55rem; color: var(--lime-dark); font-family: "DM Mono", monospace; font-size: 10px; letter-spacing: .8px; text-transform: uppercase; }
@@ -160,7 +160,7 @@ button { border: 0; }
 .process-step-content p { max-width: 315px; margin: 0; color: rgba(255,255,255,.48); font-size: 13px; line-height: 1.8; }
 .process-connector { position: absolute; top: 54px; inset-inline-start: 23px; width: 1px; height: 48px; background: linear-gradient(var(--lime), rgba(199,243,107,0)); }
 
-.values-section { background: #e9eee6; }
+.values-section { background: #dfe9ee; }
 .values-grid { display: grid; grid-template-columns: .72fr 1.28fr; gap: 5rem; align-items: start; }
 .values-copy p { max-width: 320px; margin: 1.5rem 0 0; color: var(--ink-soft); font-size: 14px; line-height: 1.9; }
 .value-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; padding-top: 1rem; }
@@ -172,7 +172,7 @@ button { border: 0; }
 .value-card-lime { color: var(--night); background: var(--lime); border-color: var(--lime); }.value-card-lime svg { color: #4b6728; }
 .value-card-outline { color: var(--ink); background: transparent; }.value-card-outline svg { color: var(--lime-dark); }
 
-.contact-section { position: relative; overflow: hidden; color: white; background: #0b281f; }
+.contact-section { position: relative; overflow: hidden; color: white; background: #002a34; }
 .contact-section::before { position: absolute; inset: 0; background: radial-gradient(circle at 17% 30%, rgba(88,216,232,.13), transparent 35%), radial-gradient(circle at 85% 70%, rgba(199,243,107,.11), transparent 32%); content: ""; }
 .contact-noise { position: absolute; inset: 0; opacity: .3; background-image: radial-gradient(rgba(255,255,255,.15) .65px, transparent .65px); background-size: 8px 8px; mask-image: linear-gradient(90deg, black, transparent 70%); }
 .contact-inner { position: relative; display: grid; grid-template-columns: .9fr 1.1fr; align-items: center; gap: 6rem; padding-top: 118px; padding-bottom: 118px; }
