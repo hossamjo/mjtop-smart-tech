@@ -13,7 +13,7 @@ import {
 import { sendContactNotification } from "./email";
 import { checkContactRateLimit, getClientFingerprint } from "./rateLimit";
 
-const contactInput = z.object({
+export const contactInput = z.object({
   name: z.string().trim().min(2).max(150),
   contact: z.string().trim().min(3).max(255),
   service: z.string().trim().max(120).optional(),
